@@ -27,7 +27,7 @@
     <div class="login-container">
         <!-- 中间的登陆框 -->
         <div class="login-dialog">
-            <h3>登陆</h3>
+            <h3>注册</h3>
             <div class="row">
                 <span>用户名</span>
                 <input type="text" id="username">
@@ -35,6 +35,10 @@
             <div class="row">
                 <span>密码</span>
                 <input type="password" id="password">
+            </div>
+            <div class="row">
+                <span>确认密码</span>
+                <input type="password" id="password2">
             </div>
             <div class="row">
                 <button id="submit" onclick="mysub()">提交</button>
@@ -47,31 +51,43 @@
         // 1. 得到用户名和密码
         var username = jQuery("#username");
         var password = jQuery("#password");
+        var password2 = jQuery("#password2");
         // 2. 非空校验
         if(jQuery.trim(username.val()) == "") {
             alert("请先输入用户名!");
-            username.focus();//
+            username.focus();//光标设置到用户输入框
             return;
         }
         if(jQuery.trim(password.val()) == "") {
             alert("请先输入用户名!");
-            password.focus();//
+            password.focus();//光标设置到用户输入框
+            return;
+        }
+        if(jQuery.trim(password2.val()) == "") {
+            alert("请先输入用户名!");
+            password2.focus();//光标设置到用户输入框
+            return;
+        }
+        // 判断密码和确认密码是否输入一致
+        if(password.val() != password2.val()) {
+            alert("两次密码输入不一致，请先检查!");
+            password2.focus();
             return;
         }
         // 3. 发起ajax请求和后端进行交互
         // 3个参数: 请求的地址、请求的参数(没有参数就写一个花括号)、服务器返回的结果回调函数
-        jQuery.getJSON("/user/login",
+        jQuery.getJSON("/user/register",
             {
                 "username":jQuery.trim(username.val()),
+                // password 和 password2都一样的，传哪个都可
                 "password":jQuery.trim(password.val())
             },
             function (data){
                 if(data!=null && data.succ==200) {// 后端成功返回结果了
                     // todo:
-                    if(data.state==1) {
-                        alert("登录成功");
-                        // 跳转到列表页面
-                        location.href='blog_list.html';
+                    if(data.state>0) {
+                        alert("注册成功");
+                        location.href='login.html';
                     }else {
                         alert(data.msg);
                     }

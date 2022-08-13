@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ghaoi.blogspringboot.mapper.UserMapper">
+    <!--     写法一 -->
+    <!--    <select id="getAll" resultType="com.ghaoi.blogspringboot.model.UserInfo">-->
+    <!--        select * from userinfo-->
+    <!--    </select>-->
+
+    <resultMap id="BaseMap" type="com.ghaoi.blogspringboot.model.UserInfo">
+        <!--        映射主键的(表中主键和程序实体类中的主键)-->
+        <id column="id" property="id"></id>
+        <!--        普通列的映射-->
+        <result column="username" property="name"></result>
+        <result column="password" property="password"></result>
+        <result column="photo" property="photo"></result>
+        <result column="createtime" property="createtime"></result>
+        <result column="updatetim" property="updatetime"></result>
+    </resultMap>
+
+    <resultMap id="BaseMap2" type="com.ghaoi.blogspringboot.model.UserInfo">
+        <!--        映射主键的(表中主键和程序实体类中的主键)-->
+        <id column="id" property="id"></id>
+        <!--        普通列的映射-->
+        <result column="username" property="name"></result>
+        <result column="password" property="password"></result>
+        <result column="photo" property="photo"></result>
+        <result column="createtime" property="createtime"></result>
+        <result column="updatetim" property="updatetime"></result>
+        <!--   外部关联     -->
+        <collection property="artList"
+                    resultMap="com.ghaoi.blogspringboot.mapper.ArticleInfoMapper.BaseMap"
+                    columnPrefix="a_"></collection>
+    </resultMap>
+
+    <!--    写法二-->
+    <select id="getAll" resultMap="BaseMap">
+        select * from userinfo
+    </select>
+
+    <select id="login" resultMap="BaseMap">
+        select * from userinfo where username=#{username} and password=#{password}
+    </select>
+
+    <select id="getAll2" resultMap="BaseMap">
+        select * from userinfo order by id ${order}
+    </select>
+
+    <select id="findByName" resultMap="BaseMap">
+        select * from userinfo where username='${name}'
+    </select>
+
+    <select id="findListByName" resultMap="BaseMap">
+        select * from userinfo where username like concat('%',#{name},'%')
+    </select>
+
+    <select id="getAll3" resultMap="BaseMap2">
+        select u.*,a.id a_id,a.title a_title from userinfo u left join articleinfo a on u.id = a.uid
+    </select>
+
+    <select id="login2" resultMap="BaseMap">
+        select * from userinfo
+            <where>
+                <if test="username != null">username=#{username}</if>
+                <if test="password != null">and password=#{password}</if>
+            </where>
+    </select>
+
+    <!-- 添加方法-->
+    <insert id="add">
+        insert into userinfo(username, password)
+        values (#{name}, #{password});
+    </insert>
+
+    <!--添加方法2: 返回自增的 id-->
+    <insert id="add2" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into userinfo(username, password)
+        values (#{name}, #{password})
+    </insert>
+
+    <insert id="add3">
+        insert into userinfo(username,password,
+                             <if test="p != null">photo,</if>
+                             state)
+        values(#{name},#{password},
+               <if test="p != null">#{p},</if>
+               ${state})
+    </insert>
+
+    <insert id="add4">
+        insert into userinfo
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="name != null">username,</if>
+                <if test="password != null">password,</if>
+                <if test="p != null">photo,</if>
+                <if test="state != null">state,</if>
+            </trim>
+            values
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="name != null">#{name},</if>
+                <if test="password != null">#{password},</if>
+                <if test="p != null">#{photo},</if>
+                <if test="state != null">#{state},</if>
+            </trim>
+    </insert>
+
+    <insert id="register">
+        insert into userinfo(username,password) values(#{username},#{password})
+    </insert>
+
+    <!--  修改方法  -->
+    <update id="update">
+        update userinfo
+        set password=#{password}
+        where id = #{id}
+    </update>
+
+    <update id="update2">
+        update userinfo
+            <set>
+                <if test="name != null">username=#{name},</if>
+                <if test="password != null">password=#{password},</if>
+            </set>
+        where id = #{id};
+    </update>
+
+    <!--  删除方法  -->
+    <delete id="delete">
+        delete from userinfo where id=#{id}
+    </delete>
+
+    <delete id="delete2">
+        delete from userinfo where id in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+
+</mapper>
