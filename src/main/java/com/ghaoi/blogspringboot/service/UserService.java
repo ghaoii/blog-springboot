@@ -4,6 +4,8 @@ import com.ghaoi.blogspringboot.mapper.UserMapper;
 import com.ghaoi.blogspringboot.model.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -13,6 +15,7 @@ public class UserService {
     @Autowired
     private UserMapper userMapper;
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public int add(UserInfo userInfo) {
         // 服务(方法编排/数据组装)
         return userMapper.add(userInfo);

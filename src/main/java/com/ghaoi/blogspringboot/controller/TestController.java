@@ -1,9 +1,13 @@
 package com.ghaoi.blogspringboot.controller;
 
 import com.ghaoi.blogspringboot.model.UserInfo;
+import com.ghaoi.blogspringboot.service.UserLogService;
 import com.ghaoi.blogspringboot.service.UserService;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +23,9 @@ public class TestController {
     @Resource
     private UserService userService;
 
+    @Resource
+    private UserLogService userLogService;
+
     @Transactional// 开启事务
     @RequestMapping("/insert")
     public int insert() {
@@ -28,7 +35,7 @@ public class TestController {
         return userService.add(user);
     }
 
-    @Transactional// 开启事务
+    @Transactional(isolation = Isolation.REPEATABLE_READ)// 开启事务
     @RequestMapping("/insert2")
     public int insert2() {
         UserInfo user = new UserInfo();
@@ -36,7 +43,28 @@ public class TestController {
         user.setPassword("Dua");
         int ret = userService.add(user);
         System.out.println("MySQL的更新行数: " + ret);
-        int num = 10 / 0;// 搞个异常
+        try {
+            int num = 10 / 0;// 搞个异常
+        } catch (Exception e) {
+            System.out.println("程序出现异常: " + e.toString());
+            // 手动回滚事务
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            ret = 0;
+        }
+        return ret;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @RequestMapping("/insert3")
+    public int insert3() {
+        // 1.添加用户
+        UserInfo user = new UserInfo();
+        user.setName("Dua");
+        user.setPassword("Dua");
+        int ret = userService.add(user);
+        System.out.println("用户的更新行数: " + ret);
+        // 添加日志
+        userLogService.add("添加了用户: " + user.getName());
         return ret;
     }
 
