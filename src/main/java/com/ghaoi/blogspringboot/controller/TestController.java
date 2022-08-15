@@ -1,11 +1,85 @@
 package com.ghaoi.blogspringboot.controller;
 
+import com.ghaoi.blogspringboot.model.UserInfo;
+import com.ghaoi.blogspringboot.service.UserService;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
-@RequestMapping("/art")
+import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/test")
 public class TestController {
+
+    @Resource
+    private UserService userService;
+
+    @Transactional// 开启事务
+    @RequestMapping("/insert")
+    public int insert() {
+        UserInfo user = new UserInfo();
+        user.setName("Ed");
+        user.setPassword("Ed");
+        return userService.add(user);
+    }
+
+    @Transactional// 开启事务
+    @RequestMapping("/insert2")
+    public int insert2() {
+        UserInfo user = new UserInfo();
+        user.setName("Dua");
+        user.setPassword("Dua");
+        int ret = userService.add(user);
+        System.out.println("MySQL的更新行数: " + ret);
+        int num = 10 / 0;// 搞个异常
+        return ret;
+    }
+
+    @RequestMapping("/index")
+    public Map<String, Object> index() {
+        Map<String, Object> map = new HashMap<>();
+//        Object obj = null;
+//        obj.hashCode();
+
+        int num = 10 / 0;
+
+        map.put("succ", 200);
+        map.put("state", 1);
+        map.put("msg", "ok");
+        return map;
+    }
+
+    @RequestMapping("/index2")
+    public UserInfo index2() {
+        UserInfo user = new UserInfo();
+        user.setName("Harley");
+        user.setPassword("2233");
+        return user;
+    }
+
+    @RequestMapping("/index3")
+    public UserInfo index3() {
+        UserInfo user = new UserInfo();
+        user.setName("Taylor");
+        user.setPassword("3344");
+        return user;
+    }
+
+    @RequestMapping("/index4")
+    public Map<String, Object> index4() {
+        Map<String, Object> ret = new HashMap<>();
+        ret.put("state", 200);
+        UserInfo user = new UserInfo();
+        user.setName("Lana");
+        user.setPassword("1122");
+        ret.put("data", user);
+        return ret;
+    }
 
     /**
      * 请求转发

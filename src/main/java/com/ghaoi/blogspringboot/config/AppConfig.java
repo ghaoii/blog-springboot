@@ -2,6 +2,7 @@ package com.ghaoi.blogspringboot.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -20,6 +21,13 @@ public class AppConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/**/*.html")
                 .excludePathPatterns("/**/*.css")
                 .excludePathPatterns("/**/*.js")
-                .excludePathPatterns("**/user/login");// 排除接口
+                .excludePathPatterns("/test/**")
+                .excludePathPatterns("/**/user/login")
+                .excludePathPatterns("/**/user/register");// 排除接口
     }
+
+//    @Override
+//    public void configurePathMatch(PathMatchConfigurer configurer) {
+//        configurer.addPathPrefix("api", c -> true);
+//    }
 }
